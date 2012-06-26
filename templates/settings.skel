@@ -1,0 +1,25 @@
+<?php
+
+$databases['default']['default'] = array(
+	'driver' => 'mysql',
+    'database' => 'databasename',
+    'username' => 'username',
+    'password' => 'password',
+    'host' => 'localhost',
+    'prefix' => '',
+);
+
+$update_free_access = FALSE;
+$drupal_hash_salt = '';
+$base_url = 'http://www.example.com';  // NO trailing slash!
+ini_set('session.gc_probability', 1);
+ini_set('session.gc_divisor', 100);
+ini_set('session.gc_maxlifetime', 200000);
+ini_set('session.cookie_lifetime', 2000000);
+$cookie_domain = '.example.com';
+$conf['site_name'] = 'My Drupal site';
+$conf['theme_default'] = 'garland';
+$conf['anonymous'] = 'Visitor';
+$conf['maintenance_theme'] = 'bartik';
+$conf['reverse_proxy'] = FALSE;
+$conf['reverse_proxy_addresses'] = array('127.0.0.1');

@@ -1,0 +1,48 @@
+//ant.importBuild "build.xml"
+
+buildscript {
+	repositories { mavenCentral() }
+	dependencies {
+		classpath 'com.admc:gradle-javaPropFile-plugin:latest.integration'
+	}
+}
+
+ext.settings =  [:]
+
+
+task init << {
+
+	
+	apply plugin: 'javaPropFile'
+	propFileLoader.traditionalPropertiesInit()
+	propFileLoader.overwrite = false
+	ant.properties["env"] = env
+	
+	propFileLoader.load(file("${env}.properties"), settings)
+	propFileLoader.load(file("${site}.properties"), settings)
+	propFileLoader.load(file("build.properties"), settings)
+	settings.each{ k, v ->
+		println "$k => $v"
+	}
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+task generateSettings(type: Copy, dependsOn: 'init') {
+    from "templates/${settings.settings_template}.skel"
+    into 'settings.php'
+    filter(ReplaceTokens, tokens: settings)
+}
+
+task test(type: Copy, dependsOn: 'init'){
+	from "templates/settings.skel"
+	into "build"
+	rename {"settings.php"}
+}
+
+import com.admc.gradle.ContentAsStringFilter
+task anyCopyTask(type: Copy) {
+    from '${ext.settings.settings_template}'
+    into 'build/tmp/x'
+    filter(ContentAsStringFilter, closure: { it.toLowerCase() })
+}

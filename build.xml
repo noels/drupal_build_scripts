@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="drupal_build_script">
+
+	<property file="${site}.properties" />
+	<loadproperties srcFile="${env}.properties" />
+	<loadproperties srcFile="build.properties" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+
+</project>
+

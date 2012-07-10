@@ -1,6 +1,4 @@
 ext.runCmd = {String cmd, File baseDir ->
-    println cmd
-
     def sout = new StringBuffer()
     def serr = new StringBuffer()
     def outProc = Runtime.runtime.exec(cmd, [] as String[], baseDir)

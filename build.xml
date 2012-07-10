@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="drupal_build_script">
 
-	<property file="${site}.properties" />
+	<property file="secure.properties" />
+	<loadproperties srcFile="${site}.properties" />
 	<loadproperties srcFile="${env}.properties" />
 	<loadproperties srcFile="build.properties" />
 	<property name="build" location="build" />

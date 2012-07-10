@@ -1,0 +1,25 @@
+ext.drush = { Map args ->
+    String drushCmd = args.drushCmd
+    String siteUrl = args.siteUrl?:ant.properties."drush.url"
+    String root = args.root?:ant.properties."drush.root"
+    String host = args.host?:ant.properties."drush.host"
+    String keyFile = args.keyFile?:ant.properties."build.userkey"
+    String buildUser = args.buildUser?:ant.properties."build.user"
+    String passphrase = args.passphrase?:ant.properties."build.userPassphrase"
+    Boolean failOnError = args.failOnError?: true
+	def cmd = "${ant.properties["drush.executable"]} --uri=${siteUrl} --root=${root} --yes --verbose ${drushCmd}"
+    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
+	ant.sshexec(
+    	username: buildUser,
+    	host:host,
+    	command: cmd,
+    	failonerror:failOnError,
+    	keyfile:keyFile,
+        passphrase:passphrase,
+        append: true,
+        trust:true,
+        output:ant.properties.remoteOutputFile,
+        verbose: 'true'
+  	)
+
+}

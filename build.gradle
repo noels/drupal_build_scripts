@@ -1,48 +1,89 @@
-//ant.importBuild "build.xml"
+/**
+set up a new project (set up repository, database, vhost)
+manage developers that have access to the repository
+backup and deploy project from developing server to staging server, or from staging to live
+make backup & restore backup
+*/
 
-buildscript {
-	repositories { mavenCentral() }
-	dependencies {
-		classpath 'com.admc:gradle-javaPropFile-plugin:latest.integration'
-	}
+import org.apache.tools.ant.filters.FixCrLfFilter
+import org.apache.tools.ant.filters.ReplaceTokens
+apply from: "runCmd.gradle"
+apply from: "drush.gradle"
+ant.importBuild "build.xml"
+
+repositories {
+    mavenCentral()
 }
+configurations {
+    antssh
+}
+dependencies {
+    antssh group: 'org.apache.ant', name: 'ant-jsch', version: '1.7.0'
+}
+ClassLoader antClassLoader = org.apache.tools.ant.Project.class.classLoader
 
-ext.settings =  [:]
-
+configurations.antssh.each { File f ->
+    antClassLoader.addURL(f.toURI().toURL())
+}
 
 task init << {
+    new File("remote.output").delete()
+    runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(ant.properties.build) )
+    //create the files directory target as gradle can't handle dangling symlinks
+    runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
+    ext.propertyFiles = [
+            "secure.properties",
+            "${ant.properties.site}.properties",
+            "${ant.properties.env}.properties",
+            "build.properties"
+    ]
+    println new File("templates/${ant.properties.settingsTemplate}.skel")
+}
 
-	
-	apply plugin: 'javaPropFile'
-	propFileLoader.traditionalPropertiesInit()
-	propFileLoader.overwrite = false
-	ant.properties["env"] = env
-	
-	propFileLoader.load(file("${env}.properties"), settings)
-	propFileLoader.load(file("${site}.properties"), settings)
-	propFileLoader.load(file("build.properties"), settings)
-	settings.each{ k, v ->
-		println "$k => $v"
+task clean  {
+	runCmd("rm -rf ${ant.properties.build}", new File("."))
+}
+
+/* this is a customised copy task which is why there is a slightly different syntax for defining it.
+	Note the missing <<.
+*/
+task copySrc(type: Copy, dependsOn: "init")  {
+	println "Copying source from ${ant.properties.src} to ${ant.properties.build}"
+    inputs.dir ant.properties.src
+    outputs.dir "."
+	from("${ant.properties.src}"){
+		exclude "sites/default"
+		exclude "sites/all/modules/dev"
+		exclude "src/sites/all/data/"
+		exclude ".git*"
 	}
+	into "${ant.properties['build']}"
 }
 
-import org.apache.tools.ant.filters.ReplaceTokens
-
-task generateSettings(type: Copy, dependsOn: 'init') {
-    from "templates/${settings.settings_template}.skel"
-    into 'settings.php'
-    filter(ReplaceTokens, tokens: settings)
+task generateSettings(type: Copy, dependsOn: "init") {
+    //inputs.files propertyFiles
+    from("templates/") {
+        include "${ant.properties.settingsTemplate}.skel"
+    }
+    into "${ant.properties['build']}/sites/${ant.properties.site}"
+    rename {name->"settings.php"}
+    filter(ReplaceTokens, tokens: ant.properties)
 }
 
-task test(type: Copy, dependsOn: 'init'){
-	from "templates/settings.skel"
-	into "build"
-	rename {"settings.php"}
+
+task createSymlinks(dependsOn: "generateSettings")  {
+	runCmd("ln -sfh . ${ant.properties."site"}", new File(ant.properties.build) )
+    println "${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}"
+    runCmd("ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(ant.properties.build))
 }
 
-import com.admc.gradle.ContentAsStringFilter
-task anyCopyTask(type: Copy) {
-    from '${ext.settings.settings_template}'
-    into 'build/tmp/x'
-    filter(ContentAsStringFilter, closure: { it.toLowerCase() })
+def test = {
+	drush(
+        drushCmd: "status",
+        root: "/Users/noels/Documents/workspace/itv/dev_environment/drupal_core/drupal",
+        failOnError: false)
+}
+
+task buildSite(dependsOn: "createSymlinks") << {
+
 }

@@ -28,31 +28,30 @@ configurations.antssh.each { File f ->
 
 task init << {
     new File("remote.output").delete()
-    runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(ant.properties.build) )
+    //See createSymlinks for why this is commented out
+    //runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(".") )
     //create the files directory target as gradle can't handle dangling symlinks
     runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
+    //runCmd("mkdir -p ${ant.properties.build}", new File(".") )
     ext.propertyFiles = [
             "secure.properties",
             "${ant.properties.site}.properties",
             "${ant.properties.env}.properties",
             "build.properties"
     ]
-    println new File("templates/${ant.properties.settingsTemplate}.skel")
 }
 
-task clean  {
+task clean << {
 	runCmd("rm -rf ${ant.properties.build}", new File("."))
 }
 
 /* this is a customised copy task which is why there is a slightly different syntax for defining it.
 	Note the missing <<.
 */
-task copySrc(type: Copy, dependsOn: "init")  {
-	println "Copying source from ${ant.properties.src} to ${ant.properties.build}"
-    inputs.dir ant.properties.src
-    outputs.dir "."
+task copySrc(type: Copy) {
 	from("${ant.properties.src}"){
 		exclude "sites/default"
+		exclude ant.properties."site"
 		exclude "sites/all/modules/dev"
 		exclude "src/sites/all/data/"
 		exclude ".git*"
@@ -60,8 +59,13 @@ task copySrc(type: Copy, dependsOn: "init")  {
 	into "${ant.properties['build']}"
 }
 
-task generateSettings(type: Copy, dependsOn: "init") {
-    //inputs.files propertyFiles
+task generateSettings(type: Copy, dependsOn: "init")  {
+    inputs.files (
+            "secure.properties",
+            "${ant.properties.site}.properties",
+            "${ant.properties.env}.properties",
+            "build.properties"
+            )
     from("templates/") {
         include "${ant.properties.settingsTemplate}.skel"
     }
@@ -71,9 +75,10 @@ task generateSettings(type: Copy, dependsOn: "init") {
 }
 
 
-task createSymlinks(dependsOn: "generateSettings")  {
-	runCmd("ln -sfh . ${ant.properties."site"}", new File(ant.properties.build) )
-    println "${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}"
+task createSymlinks(dependsOn: "generateSettings") << {
+	// this is stupid: It's left in here to document the fail
+    // It's possible that at deploy time, the symlink can be put into each server, but really shoul be fixed.
+	// runCmd("ln -sfh . ${ant.properties."site"}", new File(ant.properties.build) )
     runCmd("ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(ant.properties.build))
 }
 
@@ -84,6 +89,6 @@ def test = {
         failOnError: false)
 }
 
-task buildSite(dependsOn: "createSymlinks") << {
+task buildSite(dependsOn: "createSymlinks") {
 
 }

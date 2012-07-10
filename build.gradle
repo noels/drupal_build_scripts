@@ -26,23 +26,28 @@ configurations.antssh.each { File f ->
     antClassLoader.addURL(f.toURI().toURL())
 }
 
-task init << {
-    new File("remote.output").delete()
-    //See createSymlinks for why this is commented out
-    //runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(".") )
-    //create the files directory target as gradle can't handle dangling symlinks
-    runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
-    //runCmd("mkdir -p ${ant.properties.build}", new File(".") )
-    ext.propertyFiles = [
-            "secure.properties",
-            "${ant.properties.site}.properties",
-            "${ant.properties.env}.properties",
-            "build.properties"
-    ]
+ext.propertyFiles = [
+        "secure.properties",
+        "${ant.properties.site}.properties",
+        "${ant.properties.env}.properties",
+        "build.properties"
+]
+
+task init {
+    inputs.files propertyFiles
+    outputs.file ant.properties."drupal.filesTarget"
+    doFirst{
+        //See createSymlinks for why this is commented out
+        //runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(".") )
+        //create the files directory target as gradle can't handle dangling symlinks
+        runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
+    }
+
 }
 
 task clean << {
-	runCmd("rm -rf ${ant.properties.build}", new File("."))
+    new File("remote.output").delete()
+    runCmd("rm -rf ${ant.properties.build}", new File("."))
 }
 
 /* this is a customised copy task which is why there is a slightly different syntax for defining it.
@@ -60,12 +65,7 @@ task copySrc(type: Copy) {
 }
 
 task generateSettings(type: Copy, dependsOn: "init")  {
-    inputs.files (
-            "secure.properties",
-            "${ant.properties.site}.properties",
-            "${ant.properties.env}.properties",
-            "build.properties"
-            )
+    inputs.files propertyFiles
     from("templates/") {
         include "${ant.properties.settingsTemplate}.skel"
     }

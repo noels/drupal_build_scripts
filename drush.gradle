@@ -7,7 +7,8 @@ ext.drush = { Map args ->
     String buildUser = args.buildUser?:ant.properties."build.user"
     String passphrase = args.passphrase?:ant.properties."build.userPassphrase"
     Boolean failOnError = args.failOnError?: true
-	def cmd = "${ant.properties["drush.executable"]} --uri=${siteUrl} --root=${root} --yes --verbose ${drushCmd}"
+    String extraDrushParams = args.extraDrushParams?:""
+	def cmd = "${ant.properties["drush.executable"]} ${extraDrushParams} --uri=${siteUrl} --root=${root} --yes --verbose ${drushCmd}"
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
 	ant.sshexec(
     	username: buildUser,
@@ -18,8 +19,29 @@ ext.drush = { Map args ->
         passphrase:passphrase,
         append: true,
         trust:true,
+        outputproperty: "drushOutputBuffer",
         output:ant.properties.remoteOutputFile,
         verbose: 'true'
   	)
+}
 
+ext.drushTasks = []
+drush(drushCmd: "help --pipe 2> /dev/null")
+ant.properties.drushOutputBuffer.split("\n").each{
+    it.split(/\s/).each{ cmd ->
+        drushTasks << cmd
+    }
+}
+
+drushTasks.each{ command ->
+    task "drush_$command" << {
+        if (project.hasProperty('drushArgs'))
+            command = "$command ${project.ext.drushArgs}"
+        drush(
+            drushCmd: "$command"
+        )
+        if (ant.properties.drushOutputBuffer.contains("[error]")){
+            throw new Exception("Drush command returned an error:\n${ant.properties.drushOutputBuffer}")
+        }
+    }
 }

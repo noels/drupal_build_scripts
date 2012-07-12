@@ -7,10 +7,6 @@ make backup & restore backup
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.filters.ReplaceTokens
-apply from: "runCmd.gradle"
-apply from: "drush.gradle"
-ant.importBuild "build.xml"
-
 repositories {
     mavenCentral()
 }
@@ -22,6 +18,7 @@ dependencies {
 }
 ClassLoader antClassLoader = org.apache.tools.ant.Project.class.classLoader
 
+
 configurations.antssh.each { File f ->
     antClassLoader.addURL(f.toURI().toURL())
 }
@@ -32,6 +29,9 @@ ext.propertyFiles = [
         "${ant.properties.env}.properties",
         "build.properties"
 ]
+ant.importBuild "build.xml"
+apply from: "runCmd.gradle"
+apply from: "drush.gradle"
 
 task init {
     inputs.files propertyFiles
@@ -39,10 +39,10 @@ task init {
     doFirst{
         //See createSymlinks for why this is commented out
         //runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(".") )
+
         //create the files directory target as gradle can't handle dangling symlinks
         runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
     }
-
 }
 
 task clean << {
@@ -64,7 +64,7 @@ task copySrc(type: Copy) {
 	into "${ant.properties['build']}"
 }
 
-task generateSettings(type: Copy, dependsOn: "init")  {
+task generateSettings(type: Copy)  {
     inputs.files propertyFiles
     from("templates/") {
         include "${ant.properties.settingsTemplate}.skel"
@@ -74,21 +74,13 @@ task generateSettings(type: Copy, dependsOn: "init")  {
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
-
 task createSymlinks(dependsOn: "generateSettings") << {
-	// this is stupid: It's left in here to document the fail
-    // It's possible that at deploy time, the symlink can be put into each server, but really shoul be fixed.
+	// Symlinking the site name to the current directory is stupid: It's left in here to document the fail
+    // It's possible that at deploy time, the symlink can be put into each server, but really should be fixed.
 	// runCmd("ln -sfh . ${ant.properties."site"}", new File(ant.properties.build) )
     runCmd("ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(ant.properties.build))
 }
 
-def test = {
-	drush(
-        drushCmd: "status",
-        root: "/Users/noels/Documents/workspace/itv/dev_environment/drupal_core/drupal",
-        failOnError: false)
-}
-
-task buildSite(dependsOn: "createSymlinks") {
+task buildSite(dependsOn: ["copySrc", "generateSettings", "createSymlinks"]) {
 
 }

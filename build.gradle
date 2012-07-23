@@ -7,21 +7,6 @@ make backup & restore backup
 
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.filters.ReplaceTokens
-repositories {
-    mavenCentral()
-}
-configurations {
-    antssh
-}
-dependencies {
-    antssh group: 'org.apache.ant', name: 'ant-jsch', version: '1.7.0'
-}
-ClassLoader antClassLoader = org.apache.tools.ant.Project.class.classLoader
-
-
-configurations.antssh.each { File f ->
-    antClassLoader.addURL(f.toURI().toURL())
-}
 
 ext.propertyFiles = [
         "secure.properties",
@@ -32,6 +17,7 @@ ext.propertyFiles = [
 ant.importBuild "build.xml"
 apply from: "runCmd.gradle"
 apply from: "drush.gradle"
+apply from: "database.gradle"
 
 task init {
     inputs.files propertyFiles
@@ -47,7 +33,7 @@ task init {
 
 task clean << {
     new File("remote.output").delete()
-    runCmd("rm -rf ${ant.properties.build}", new File("."))
+    runCmd("""sudo /bin/rm -rf ${ant.properties.build}""", new File("."))
 }
 
 /* this is a customised copy task which is why there is a slightly different syntax for defining it.
@@ -61,15 +47,17 @@ task copySrc(type: Copy) {
 		exclude "src/sites/all/data/"
 		exclude ".git*"
 	}
-	into "${ant.properties['build']}"
+	into "${ant.properties."drupal.root"}"
 }
 
 task generateSettings(type: Copy)  {
     inputs.files propertyFiles
+    fileMode 0444
+    dirMode 0555
     from("templates/") {
         include "${ant.properties.settingsTemplate}.skel"
     }
-    into "${ant.properties['build']}/sites/${ant.properties.site}"
+    into "${ant.properties."drupal.root"}/sites/${ant.properties.site}"
     rename {name->"settings.php"}
     filter(ReplaceTokens, tokens: ant.properties)
 }
@@ -78,9 +66,59 @@ task createSymlinks(dependsOn: "generateSettings") << {
 	// Symlinking the site name to the current directory is stupid: It's left in here to document the fail
     // It's possible that at deploy time, the symlink can be put into each server, but really should be fixed.
 	// runCmd("ln -sfh . ${ant.properties."site"}", new File(ant.properties.build) )
-    runCmd("ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(ant.properties.build))
+    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties."drupal.root"}"))
+}
+
+task compassCompile(dependsOn: "copySrc") << {
+    drush(
+            drushCmd: "compass"
+    )
+}
+
+ext.dbUrl = {
+    "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }
 
 task buildSite(dependsOn: ["copySrc", "generateSettings", "createSymlinks"]) {
 
+}
+
+task installDrupal(dependsOn: buildSite) << {
+    sql( sqlQuery: dropDatabaseSql)
+    sql( sqlQuery: createDatabaseSql)
+    ant.properties.webservers.split(',').each{ server ->
+        sql( sqlQuery: grantPermissionsSql.replaceAll("@@HOST@@", server))
+    }
+    drush(
+            drushCmd: "site-install ${ant.properties."drupal.profile"} " +
+                "--sites-subdir=${ant.properties."site"} " +
+                "--account-name=${ant.properties."drupal.adminuser"} " +
+                "--account-pass=${ant.properties."drupal.adminpass"} " +
+                "--site-mail='${ant.properties.mail}' " +
+                "--site-name='${ant.properties."site"}' --yes"
+    )
+
+    if (ant.properties."drupal.modules"){
+        drush(
+                drushCmd: "pm-enable ${ant.properties."drupal.modules".split(',').join(' ')}"
+        )
+    }
+}
+
+task dropDatabase() << {
+    def host = ant.properties."db.host"
+    runCmd
+}
+
+task backupDatabase() << {
+    backupDatabaseToGzip()
+}
+
+task recreateDatabase() << {
+    sql( sqlQuery: dropDatabaseSql)
+    sql( sqlQuery: createDatabaseSql)
+}
+
+task restoreDatabase() << {
+    restoreDatabaseFromGzip()
 }

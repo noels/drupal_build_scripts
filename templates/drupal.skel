@@ -14,19 +14,19 @@ $drupal_hash_salt = '';
 $base_url = 'http://www.example.com';  
 
 ini_set('session.gc_probability', 1);
+ini_set('session.cache_expire',     @session.cacheExpire@);
 ini_set('session.gc_divisor', 100);
-ini_set('session.gc_maxlifetime', @session.gc_maxlifetime@);
-ini_set('session.cookie_lifetime', @session.cookie_lifetime@);
-$cookie_domain = '@session.cookie_domain@';
+ini_set('session.gc_maxlifetime', @session.gcMaxlifetime@);
+ini_set('session.cookie_lifetime', @session.cookieLifetime@);
+$cookie_domain = '@session.cookieDomain@';
 $conf['site_name'] = '@site@';
 $conf['theme_default'] = 'garland';
 $conf['anonymous'] = 'Visitor';
 $conf['maintenance_theme'] = 'bartik';
 $conf['reverse_proxy'] = FALSE;
 $conf['reverse_proxy_addresses'] = array('127.0.0.1');
-@error_reporting_comment@error_reporting(0);
+@errorReportingComment@error_reporting(0);
 
-@include_domain_access@
 
 // SCM revision for cache killing
 define('REVISION', '@rev@');

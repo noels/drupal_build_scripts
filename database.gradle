@@ -1,0 +1,92 @@
+ext.dropDatabaseSql = " DROP DATABASE IF EXISTS ${ant.properties."db.name"}; "
+ext.createDatabaseSql = "CREATE DATABASE  ${ant.properties."db.name"};"
+ext.grantPermissionsSql = """ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER
+  ON ${ant.properties."db.name"}.*
+  TO '${ant.properties."db.name"}'@'@@HOST@@'
+  IDENTIFIED BY '${ant.properties."db.pass"}';
+  FLUSH PRIVILEGES;"""
+
+ext.getPass = {
+    String pass = ''
+    if (ant.properties."db.adminpass"){
+        pass ="-p${ant.properties."db.adminpass"}"
+    }
+    pass
+}
+
+ext.sql = { Map args ->
+    String sqlQuery = args.sqlQuery
+    String host = args.host?:ant.properties."db.host"
+    String keyFile = args.keyFile?:ant.properties."build.userkey"
+    String buildUser = args.buildUser?:ant.properties."build.user"
+    String passphrase = args.passphrase?:ant.properties."build.userPassphrase"
+    Boolean failOnError = args.failOnError?: true
+    def cmd = "${ant.properties["mysql.executable"]} -u${ant.properties."db.adminuser"} ${getPass()} -h${ant.properties."db.host"} -e\"${sqlQuery}\""
+    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${sqlQuery}\nOn host ${host} As ${buildUser}\nOutput:\n")
+    println cmd
+    ant.sshexec(
+            username: buildUser,
+            host:host,
+            command: cmd,
+            failonerror:failOnError,
+            keyfile:keyFile,
+            passphrase:passphrase,
+            append: true,
+            trust:true,
+            outputproperty: "drushOutputBuffer",
+            output:ant.properties.remoteOutputFile,
+            verbose: 'true'
+    )
+}
+
+
+ext.restoreDatabaseFromGzip = {Map args ->
+    String file = args?.file?:"${ant.properties.site}_${ant.properties.env}.sql.gz"
+    String host = args?.host?:ant.properties."db.host"
+    String keyFile = args?.keyFile?:ant.properties."build.userkey"
+    String buildUser = args?.buildUser?:ant.properties."build.user"
+    String passphrase = args?.passphrase?:ant.properties."build.userPassphrase"
+    Boolean failOnError = args?.failOnError?: true
+    def cmd = "gunzip < ${file} | ${ant.properties["mysql.executable"]} -u${ant.properties."db.adminuser"} ${getPass()} -h${ant.properties."db.host"} ${ant.properties."db.name"}"
+    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
+    println cmd
+    ant.sshexec(
+            username: buildUser,
+            host:host,
+            command: cmd,
+            failonerror:failOnError,
+            keyfile:keyFile,
+            passphrase:passphrase,
+            append: true,
+            trust:true,
+            outputproperty: "drushOutputBuffer",
+            output:ant.properties.remoteOutputFile,
+            verbose: 'true'
+    )
+}
+
+ext.backupDatabaseToGzip = { Map args ->
+    String file = args?.file?:"${ant.properties.site}_${ant.properties.env}.sql.gz"
+    String host = args?.host?:ant.properties."db.host"
+    String keyFile = args?.keyFile?:ant.properties."build.userkey"
+    String buildUser = args?.buildUser?:ant.properties."build.user"
+    String passphrase = args?.passphrase?:ant.properties."build.userPassphrase"
+    Boolean failOnError = args?.failOnError?: true
+    def cmd = "${ant.properties["mysqldump.executable"]} -u${ant.properties."db.adminuser"} ${getPass()} -h${ant.properties."db.host"} ${ant.properties."db.name"} | gzip > ${file}"
+    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
+    println cmd
+    ant.sshexec(
+            username: buildUser,
+            host:host,
+            command: cmd,
+            failonerror:failOnError,
+            keyfile:keyFile,
+            passphrase:passphrase,
+            append: true,
+            trust:true,
+            outputproperty: "drushOutputBuffer",
+            output:ant.properties.remoteOutputFile,
+            verbose: 'true'
+    )
+
+}

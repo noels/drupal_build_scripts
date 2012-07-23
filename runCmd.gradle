@@ -1,6 +1,7 @@
 ext.runCmd = {String cmd, File baseDir ->
     def sout = new StringBuffer()
     def serr = new StringBuffer()
+    println cmd
     def outProc = Runtime.runtime.exec(cmd, [] as String[], baseDir)
     def running = true
     def bufferPrinter = {buffer ->
@@ -27,6 +28,7 @@ ext.runCmd = {String cmd, File baseDir ->
 
     if (outProc.exitValue()) {
       println "Error code: ${outProc.exitValue()}"
+      println serr
       System.exit(1)
     }
 }

@@ -1,3 +1,19 @@
+repositories {
+    mavenCentral()
+}
+configurations {
+    antssh
+}
+dependencies {
+    antssh group: 'org.apache.ant', name: 'ant-jsch', version: '1.7.0'
+}
+ClassLoader antClassLoader = org.apache.tools.ant.Project.class.classLoader
+
+
+configurations.antssh.each { File f ->
+    antClassLoader.addURL(f.toURI().toURL())
+}
+
 ext.drush = { Map args ->
     String drushCmd = args.drushCmd
     String siteUrl = args.siteUrl?:ant.properties."drush.url"
@@ -10,6 +26,7 @@ ext.drush = { Map args ->
     String extraDrushParams = args.extraDrushParams?:""
 	def cmd = "${ant.properties["drush.executable"]} ${extraDrushParams} --uri=${siteUrl} --root=${root} --yes --verbose ${drushCmd}"
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
+    println cmd
 	ant.sshexec(
     	username: buildUser,
     	host:host,
@@ -23,6 +40,9 @@ ext.drush = { Map args ->
         output:ant.properties.remoteOutputFile,
         verbose: 'true'
   	)
+    if (ant.properties.drushOutputBuffer.contains("[error]")){
+        throw new Exception("Drush command returned an error:\n${ant.properties.drushOutputBuffer}")
+    }
 }
 
 ext.drushTasks = []
@@ -40,8 +60,5 @@ drushTasks.each{ command ->
         drush(
             drushCmd: "$command"
         )
-        if (ant.properties.drushOutputBuffer.contains("[error]")){
-            throw new Exception("Drush command returned an error:\n${ant.properties.drushOutputBuffer}")
-        }
     }
 }

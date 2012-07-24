@@ -1,0 +1,10 @@
+<VirtualHost *>
+  ServerName @site@
+  DocumentRoot @docroot@
+  Alias /@site@ @docroot@
+  <Directory @docroot@>
+    AllowOverride All
+    Options FollowSymLinks
+  </Directory>
+
+</VirtualHost>

@@ -62,6 +62,18 @@ task generateSettings(type: Copy)  {
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
+task generateVhost(type: Copy) {
+    inputs.files propertyFiles
+    fileMode 0444
+    dirMode 0555
+    from("templates/"){
+        include "vhost.skel"
+    }
+    into "${ant.properties.build}/etc/"
+    rename {name->"vhost-${ant.properties.site}.conf"}
+    filter(ReplaceTokens, tokens: ant.properties)
+}
+
 task createSymlinks(dependsOn: "generateSettings") << {
 	// Symlinking the site name to the current directory is stupid: It's left in here to document the fail
     // It's possible that at deploy time, the symlink can be put into each server, but really should be fixed.
@@ -79,7 +91,7 @@ ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }
 
-task buildSite(dependsOn: ["copySrc", "generateSettings", "createSymlinks"]) {
+task buildSite(dependsOn: ["copySrc", "generateSettings", "generateVhost", "createSymlinks"]) {
 
 }
 
@@ -105,20 +117,7 @@ task installDrupal(dependsOn: buildSite) << {
     }
 }
 
-task dropDatabase() << {
-    def host = ant.properties."db.host"
-    runCmd
-}
 
-task backupDatabase() << {
-    backupDatabaseToGzip()
-}
+task deployDrupal(dependsOn: buildSite) << {
 
-task recreateDatabase() << {
-    sql( sqlQuery: dropDatabaseSql)
-    sql( sqlQuery: createDatabaseSql)
-}
-
-task restoreDatabase() << {
-    restoreDatabaseFromGzip()
 }

@@ -77,12 +77,6 @@ task createFilesSymlinks(dependsOn: "generateSettings") << {
     runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties."drupal.root"}"))
 }
 
-task compassCompile(dependsOn: "copySrc") << {
-    drush(
-            drushCmd: "compass"
-    )
-}
-
 ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }

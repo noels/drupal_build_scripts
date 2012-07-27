@@ -124,7 +124,7 @@ task deployDrupal(dependsOn: packageSite) << {
     ant.properties.webservers.split(",").each { servers << it   }
     println servers.dump()
     servers.each{server ->
-        copyPackageToServer(server)
+        copyFilesToServer(server)
     }
 
 

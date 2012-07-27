@@ -1,12 +1,9 @@
-ext.copyPackageToServer = {server, args = [] ->
+ext.copyFilesToServer = {server, args = [] ->
     String keyFile = args.keyFile?:ant.properties."build.userkey"
     String buildUser = args.buildUser?:ant.properties."build.user"
-    runCmd("scp -i ${keyFile} ${ant.properties."application.name"}.tar.gz ${buildUser}@${server}:${ant.properties."drupal.root"}", new File(ant.properties.target))
-}
-
-ext.unpackOnServer = {server, agrs = [] ->
-    runSshCmd( "${ant.properties."drupal.root"} ; tar xzf ${ant.properties."application.name"}.tar.gz"
-
-    )
-
+    String deployFolder = ant.properties.deployFolder
+    runSshCmd("mkdir -p ${deployFolder}", server)
+    runCmd("scp -i ${keyFile} ${ant.properties."application.name"}.tar.gz ${buildUser}@${server}:${deployFolder}", new File(ant.properties.target))
+    runSshCmd( "cd ${deployFolder}; tar xzf ${ant.properties."application.name"}.tar.gz", server)
+    runSshCmd("rm -f ${deployFolder}/${ant.properties."application.name"}.tar.gz", server)
 }

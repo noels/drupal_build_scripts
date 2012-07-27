@@ -32,3 +32,26 @@ ext.runCmd = {String cmd, File baseDir ->
       System.exit(1)
     }
 }
+
+ext.runSshCmd = {cmd, host, args = [] ->
+    String keyFile = args.keyFile?:ant.properties."build.userkey"
+    String buildUser = args.buildUser?:ant.properties."build.user"
+    String passphrase = args.passphrase?:ant.properties."build.userPassphrase"
+    Boolean failOnError = args.failOnError?: true
+    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
+    println cmd
+    ant.sshexec(
+            username: buildUser,
+            host:host,
+            command: cmd,
+            failonerror:failOnError,
+            keyfile:keyFile,
+            passphrase:passphrase,
+            append: true,
+            trust:true,
+            outputproperty: "drushOutputBuffer",
+            output:ant.properties.remoteOutputFile,
+            verbose: 'true'
+    )
+}
+

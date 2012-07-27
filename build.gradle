@@ -46,7 +46,7 @@ task copySrc(type: Copy) {
 		exclude "src/sites/all/data/"
 		exclude ".git*"
 	}
-	into "${ant.properties."drupal.root"}"
+	into "${ant.properties.build}/${ant.properties."application.name"}"
 }
 
 task generateSettings(type: Copy)  {
@@ -74,7 +74,7 @@ task generateVhost(type: Copy) {
 }
 
 task createFilesSymlinks(dependsOn: "generateSettings") << {
-    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties.build}"))
+    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties.build}/${ant.properties."application.name"}"))
 }
 
 ext.dbUrl = {

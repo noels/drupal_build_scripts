@@ -20,6 +20,8 @@ apply from: "drush.gradle"
 apply from: "database.gradle"
 apply from: "deploy.gradle"
 
+ext.buildApplicationRoot = "${ant.properties.build}/${ant.properties."application.name"}"
+
 task init {
     inputs.files propertyFiles
     outputs.file ant.properties."drupal.filesTarget"
@@ -46,7 +48,7 @@ task copySrc(type: Copy) {
 		exclude "src/sites/all/data/"
 		exclude ".git*"
 	}
-	into "${ant.properties.build}/${ant.properties."application.name"}"
+	into "${buildApplicationRoot}"
 }
 
 task generateSettings(type: Copy)  {
@@ -56,7 +58,7 @@ task generateSettings(type: Copy)  {
     from("templates/") {
         include "${ant.properties.settingsTemplate}.skel"
     }
-    into "${ant.properties.build}/${ant.properties."application.name"}/sites/${ant.properties.site}"
+    into "${buildApplicationRoot}/sites/${ant.properties.site}"
     rename {name->"settings.php"}
     filter(ReplaceTokens, tokens: ant.properties)
 }
@@ -74,7 +76,7 @@ task generateVhost(type: Copy) {
 }
 
 task createFilesSymlinks(dependsOn: "generateSettings") << {
-    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties.build}/${ant.properties."application.name"}"))
+    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${buildApplicationRoot}"))
 }
 
 ext.dbUrl = {
@@ -111,10 +113,8 @@ task packageSite(dependsOn: buildSite) {
     inputs.dir ant.properties.build
     outputs.file "${ant.properties.target}/${ant.properties."application.name"}.tar.gz"
     doFirst{
-        def src = "${ant.properties.build}/${ant.properties."application.name"}"
-        def depth = src.findAll("/").size()
         runCmd("mkdir -p ${ant.properties.target}", new File(ant.properties.build))
-        runCmd("tar czf  ${ant.properties.target}/${ant.properties."application.name"}.tar.gz .", new File(src))
+        runCmd("tar czf  ${ant.properties.target}/${ant.properties."application.name"}.tar.gz .", new File(buildApplicationRoot))
     }
 }
 

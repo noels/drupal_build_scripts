@@ -74,7 +74,7 @@ task generateVhost(type: Copy) {
 }
 
 task createFilesSymlinks(dependsOn: "generateSettings") << {
-    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties."drupal.root"}"))
+    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties.build}"))
 }
 
 ext.dbUrl = {

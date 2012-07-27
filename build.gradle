@@ -18,14 +18,12 @@ ant.importBuild "build.xml"
 apply from: "runCmd.gradle"
 apply from: "drush.gradle"
 apply from: "database.gradle"
+apply from: "deploy.gradle"
 
 task init {
     inputs.files propertyFiles
     outputs.file ant.properties."drupal.filesTarget"
     doFirst{
-        //See createSymlinks for why this is commented out
-        //runCmd("rm -f ${ant.properties.build}/${ant.properties."site"}", new File(".") )
-
         //create the files directory target as gradle can't handle dangling symlinks
         runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
     }
@@ -34,6 +32,7 @@ task init {
 task clean << {
     new File("remote.output").delete()
     runCmd("""sudo /bin/rm -rf ${ant.properties.build}""", new File("."))
+    runCmd("""sudo /bin/rm -rf ${ant.properties.target}""", new File("."))
 }
 
 /* this is a customised copy task which is why there is a slightly different syntax for defining it.
@@ -57,7 +56,7 @@ task generateSettings(type: Copy)  {
     from("templates/") {
         include "${ant.properties.settingsTemplate}.skel"
     }
-    into "${ant.properties."drupal.root"}/sites/${ant.properties.site}"
+    into "${ant.properties.build}/${ant.properties."application.name"}/sites/${ant.properties.site}"
     rename {name->"settings.php"}
     filter(ReplaceTokens, tokens: ant.properties)
 }
@@ -69,15 +68,12 @@ task generateVhost(type: Copy) {
     from("templates/"){
         include "vhost.skel"
     }
-    into "${ant.properties.build}/etc/"
+    into "${ant.properties.target}/etc/"
     rename {name->"vhost-${ant.properties.site}.conf"}
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
-task createSymlinks(dependsOn: "generateSettings") << {
-	// Symlinking the site name to the current directory is stupid: It's left in here to document the fail
-    // It's possible that at deploy time, the symlink can be put into each server, but really should be fixed.
-	// runCmd("ln -sfh . ${ant.properties."site"}", new File(ant.properties.build) )
+task createFilesSymlinks(dependsOn: "generateSettings") << {
     runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${ant.properties."drupal.root"}"))
 }
 
@@ -91,7 +87,7 @@ ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }
 
-task buildSite(dependsOn: ["copySrc", "generateSettings", "generateVhost", "createSymlinks"]) {
+task buildSite(dependsOn: ["copySrc", "generateSettings", "generateVhost", "createFilesSymlinks"]) {
 
 }
 
@@ -117,7 +113,25 @@ task installDrupal(dependsOn: buildSite) << {
     }
 }
 
+task packageSite(dependsOn: buildSite) {
+    inputs.dir ant.properties.build
+    outputs.file "${ant.properties.target}/${ant.properties."application.name"}.tar.gz"
+    doFirst{
+        def src = "${ant.properties.build}/${ant.properties."application.name"}"
+        def depth = src.findAll("/").size()
+        runCmd("mkdir -p ${ant.properties.target}", new File(ant.properties.build))
+        runCmd("tar czf  ${ant.properties.target}/${ant.properties."application.name"}.tar.gz .", new File(src))
+    }
+}
 
-task deployDrupal(dependsOn: buildSite) << {
+task deployDrupal(dependsOn: packageSite) << {
+    def servers = []
+    servers << ant.properties."drush.host"
+    ant.properties.webservers.split(",").each { servers << it   }
+    println servers.dump()
+    servers.each{server ->
+        copyPackageToServer(server)
+    }
+
 
 }

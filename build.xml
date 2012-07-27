@@ -6,7 +6,7 @@
 	<loadproperties srcFile="${env}.properties" />
 	<loadproperties srcFile="build.properties" />
 	<property name="build" location="build" />
-	<property name="dist" location="dist" />
+	<property name="target" location="target" />
 
 </project>
 

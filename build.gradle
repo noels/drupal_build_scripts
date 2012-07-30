@@ -63,6 +63,10 @@ task generateSettings(type: Copy)  {
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
+generateSettings.doFirst {
+        runCmd("sudo /bin/rm sites/${ant.properties.site}/settings.php", new File(buildApplicationRoot))
+}
+
 task generateVhost(type: Copy) {
     inputs.files propertyFiles
     fileMode 0444
@@ -75,8 +79,13 @@ task generateVhost(type: Copy) {
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
+generateVhost.doFirst {
+    runCmd("sudo /bin/rm etc/vhost-${ant.properties.site}.conf", new File(ant.properties.target))
+}
+
+
 task createFilesSymlinks(dependsOn: "generateSettings") << {
-    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File("${buildApplicationRoot}"))
+    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(buildApplicationRoot))
 }
 
 ext.dbUrl = {
@@ -127,6 +136,7 @@ task deployDrupal(dependsOn: packageSite) << {
     }
     servers.each{server ->
         createReleaseSymlinks(server)
+        restartApache(server)
     }
 
 

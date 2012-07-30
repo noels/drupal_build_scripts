@@ -7,3 +7,11 @@ ext.copyFilesToServer = {server, args = [] ->
     runSshCmd( "cd ${deployFolder}; tar xzf ${ant.properties."application.name"}.tar.gz", server)
     runSshCmd("rm -f ${deployFolder}/${ant.properties."application.name"}.tar.gz", server)
 }
+
+ext.createReleaseSymlinks  = {server, args = [] ->
+    String keyFile = args.keyFile?:ant.properties."build.userkey"
+    String buildUser = args.buildUser?:ant.properties."build.user"
+    String deployFolder = "${ant.properties.deployFolder}/build_${ant.properties.BUILD_NUMBER}"
+    String releaseFolder = "${ant.properties.deployFolder}/current"
+    runSshCmd( "ln -sf ${deployFolder} ${releaseFolder}", server)
+}

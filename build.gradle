@@ -122,9 +122,11 @@ task deployDrupal(dependsOn: packageSite) << {
     def servers = []
     servers << ant.properties."drush.host"
     ant.properties.webservers.split(",").each { servers << it   }
-    println servers.dump()
     servers.each{server ->
         copyFilesToServer(server)
+    }
+    servers.each{server ->
+        createReleaseSymlinks(server)
     }
 
 

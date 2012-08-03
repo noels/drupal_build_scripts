@@ -33,8 +33,8 @@ task init {
 
 task clean << {
     new File("remote.output").delete()
-    runCmd("""sudo /bin/rm -rf ${ant.properties.build}""", new File("."))
-    runCmd("""sudo /bin/rm -rf ${ant.properties.target}""", new File("."))
+    runCmd("""/bin/rm -rf ${ant.properties.build}""", new File("."))
+    runCmd("""/bin/rm -rf ${ant.properties.target}""", new File("."))
 }
 
 /* this is a customised copy task which is why there is a slightly different syntax for defining it.
@@ -64,7 +64,7 @@ task generateSettings(type: Copy)  {
 }
 
 generateSettings.doFirst {
-        runCmd("sudo /bin/rm sites/${ant.properties.site}/settings.php", new File(buildApplicationRoot))
+        runCmd("/bin/rm -f sites/${ant.properties.site}/settings.php", new File(buildApplicationRoot))
 }
 
 task generateVhost(type: Copy) {
@@ -80,12 +80,12 @@ task generateVhost(type: Copy) {
 }
 
 generateVhost.doFirst {
-    runCmd("sudo /bin/rm etc/vhost-${ant.properties.site}.conf", new File(ant.properties.target))
+    runCmd("/bin/rm -f etc/vhost-${ant.properties.site}.conf", new File(ant.properties.target))
 }
 
 
 task createFilesSymlinks(dependsOn: "generateSettings") << {
-    runCmd("sudo /bin/ln -sfh ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(buildApplicationRoot))
+    runCmd("/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(buildApplicationRoot))
 }
 
 ext.dbUrl = {

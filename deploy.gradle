@@ -2,7 +2,7 @@ ext.copyFilesToServer = {server, args = [] ->
     String keyFile = args.keyFile?:ant.properties."build.userkey"
     String buildUser = args.buildUser?:ant.properties."build.user"
     String deployFolder = "${ant.properties.deployFolder}/build_${ant.properties.BUILD_NUMBER}"
-    runSshCmd("mkdir -p ${deployFolder}; rm ${ant.properties."apacheVhostDir"}/vhost-${ant.properties.site}.conf", server)
+    runSshCmd("mkdir -p ${deployFolder}; rm -f ${ant.properties."apacheVhostDir"}/vhost-${ant.properties.site}.conf", server)
     runCmd("scp -i ${keyFile} ${ant.properties."application.name"}.tar.gz ${buildUser}@${server}:${deployFolder}", new File(ant.properties.target))
     runCmd("scp -i ${keyFile} etc/vhost-${ant.properties.site}.conf ${ant.properties."apacheVhostDir"}", new File(ant.properties.target))
     runSshCmd( "cd ${deployFolder}; tar xzf ${ant.properties."application.name"}.tar.gz", server)

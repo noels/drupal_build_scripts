@@ -20,6 +20,7 @@ apply from: "drush.gradle"
 apply from: "database.gradle"
 apply from: "deploy.gradle"
 
+println "build dir is:  ${ant.properties.build}"
 ext.buildApplicationRoot = "${ant.properties.build}/${ant.properties."application.name"}/build_${ant.properties.BUILD_NUMBER}"
 
 task init {

@@ -64,10 +64,10 @@ task generateSettings(type: Copy)  {
 }
 
 generateSettings.doFirst {
-        runCmd("/bin/rm -f sites/${ant.properties.site}/settings.php", new File(buildApplicationRoot))
+        runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/settings.php", new File("."))
 }
 
-task generateVhost(type: Copy, dependsOn: copySrc) {
+task generateVhost(type: Copy) {
     inputs.files propertyFiles
     fileMode 0444
     dirMode 0555
@@ -80,7 +80,7 @@ task generateVhost(type: Copy, dependsOn: copySrc) {
 }
 
 generateVhost.doFirst {
-    runCmd("/bin/rm -f etc/vhost-${ant.properties.site}.conf", new File(ant.properties.target))
+    runCmd("/bin/rm -f target/etc/vhost-${ant.properties.site}.conf", new File("."))
 }
 
 

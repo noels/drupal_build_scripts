@@ -5,8 +5,8 @@
 	<loadproperties srcFile="${site}.properties" />
 	<loadproperties srcFile="${env}.properties" />
 	<loadproperties srcFile="build.properties" />
-	<property name="build" location="build" />
-	<property name="target" location="target" />
+	<property name="build" location="../build" />
+	<property name="target" location="../target" />
 
 </project>
 

@@ -67,7 +67,7 @@ generateSettings.doFirst {
         runCmd("/bin/rm -f sites/${ant.properties.site}/settings.php", new File(buildApplicationRoot))
 }
 
-task generateVhost(type: Copy) {
+task generateVhost(type: Copy, dependsOn: copySrc) {
     inputs.files propertyFiles
     fileMode 0444
     dirMode 0555

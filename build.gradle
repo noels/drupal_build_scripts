@@ -40,7 +40,7 @@ task clean << {
 /* this is a customised copy task which is why there is a slightly different syntax for defining it.
 	Note the missing <<.
 */
-task copySrc(type: Copy) {
+task copySrc(type: Copy, dependsOn: init) {
 	from("${ant.properties.src}"){
 		exclude "sites/default"
 		exclude ant.properties."site"

@@ -6,5 +6,4 @@
     AllowOverride All
     Options FollowSymLinks
   </Directory>
-
 </VirtualHost>

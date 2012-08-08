@@ -9,6 +9,7 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.filters.ReplaceTokens
 
 ext.propertyFiles = [
+        "${ant.properties.env}.secure.properties",
         "secure.properties",
         "${ant.properties.site}.properties",
         "${ant.properties.env}.properties",

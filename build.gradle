@@ -44,7 +44,7 @@ task clean << {
 */
 task copySrc(type: Copy, dependsOn: init) {
 	from("${ant.properties.src}"){
-		exclude "sites/default"
+		//exclude "sites/default"
 		exclude ant.properties."site"
 		exclude "sites/all/modules/dev"
 		exclude "src/sites/all/data/"

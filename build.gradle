@@ -98,7 +98,7 @@ task buildSite(dependsOn: ["copySrc", "generateSettings", "generateVhost", "crea
 
 }
 
-task installDrupal(dependsOn: buildSite) << {
+task installDrupal(dependsOn: deployDrupal) << {
     sql( sqlQuery: dropDatabaseSql)
     sql( sqlQuery: createDatabaseSql)
     ant.properties.webservers.split(',').each{ server ->

@@ -98,27 +98,6 @@ task buildSite(dependsOn: ["copySrc", "generateSettings", "generateVhost", "crea
 
 }
 
-task installDrupal(dependsOn: deployDrupal) << {
-    sql( sqlQuery: dropDatabaseSql)
-    sql( sqlQuery: createDatabaseSql)
-    ant.properties.webservers.split(',').each{ server ->
-        sql( sqlQuery: grantPermissionsSql.replaceAll("@@HOST@@", server))
-    }
-    drush(
-            drushCmd: "site-install ${ant.properties."drupal.profile"} " +
-                "--sites-subdir=${ant.properties."site"} " +
-                "--account-name=${ant.properties."drupal.adminuser"} " +
-                "--account-pass=${ant.properties."drupal.adminpass"} " +
-                "--site-mail='${ant.properties.mail}' " +
-                "--site-name='${ant.properties."site"}' --yes"
-    )
-
-    if (ant.properties."drupal.modules"){
-        drush(
-                drushCmd: "pm-enable ${ant.properties."drupal.modules".split(',').join(' ')}"
-        )
-    }
-}
 
 task packageSite(dependsOn: buildSite) {
     inputs.dir ant.properties.build
@@ -142,4 +121,26 @@ task deployDrupal(dependsOn: packageSite) << {
     }
 
 
+}
+
+task installDrupal(dependsOn: deployDrupal) << {
+    sql( sqlQuery: dropDatabaseSql)
+    sql( sqlQuery: createDatabaseSql)
+    ant.properties.webservers.split(',').each{ server ->
+        sql( sqlQuery: grantPermissionsSql.replaceAll("@@HOST@@", server))
+    }
+    drush(
+            drushCmd: "site-install ${ant.properties."drupal.profile"} " +
+                    "--sites-subdir=${ant.properties."site"} " +
+                    "--account-name=${ant.properties."drupal.adminuser"} " +
+                    "--account-pass=${ant.properties."drupal.adminpass"} " +
+                    "--site-mail='${ant.properties.mail}' " +
+                    "--site-name='${ant.properties."site"}' --yes"
+    )
+
+    if (ant.properties."drupal.modules"){
+        drush(
+                drushCmd: "pm-enable ${ant.properties."drupal.modules".split(',').join(' ')}"
+        )
+    }
 }

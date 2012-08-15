@@ -68,9 +68,8 @@ task generateSettings(type: Copy)  {
 generateSettings.doFirst {
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/settings.php", new File("."))
 }
-task linkSettingsFile(dependsOn: generateSettings) << {
-    runCmd("/bin/mkdir -p ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/", new File("."))
-    runCmd("/bin/ln -s sites/${ant.properties.site}/settings.php sites/${ant.properties.baseUrl}/", new File(buildApplicationRoot))
+task linkSiteFolder(dependsOn: generateSettings) << {
+    runCmd("/bin/ln -s sites/${ant.properties.site} sites/${ant.properties.baseUrl}", new File(buildApplicationRoot))
 }
 
 task generateVhost(type: Copy) {

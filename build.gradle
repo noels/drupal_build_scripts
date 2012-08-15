@@ -68,7 +68,7 @@ task generateSettings(type: Copy)  {
 generateSettings.doFirst {
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/settings.php", new File("."))
 }
-linkSettingsFile(dependsOn: generateSettings) << {
+task linkSettingsFile(dependsOn: generateSettings) << {
     runCmd("/bin/ln -s ${buildApplicationRoot}/sites/${ant.properties.site}/settings.php ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/", new File("."))
 }
 

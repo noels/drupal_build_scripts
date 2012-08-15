@@ -2,7 +2,7 @@ ext.dropDatabaseSql = " DROP DATABASE IF EXISTS ${ant.properties."db.name"}; "
 ext.createDatabaseSql = "CREATE DATABASE  ${ant.properties."db.name"};"
 ext.grantPermissionsSql = """ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER
   ON ${ant.properties."db.name"}.*
-  TO '${ant.properties."db.name"}'@'@@HOST@@'
+  TO '${ant.properties."db.user"}'@'@@HOST@@'
   IDENTIFIED BY '${ant.properties."db.pass"}';
   FLUSH PRIVILEGES;"""
 

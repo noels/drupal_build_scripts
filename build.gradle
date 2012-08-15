@@ -68,7 +68,7 @@ task generateSettings(type: Copy)  {
 generateSettings.doFirst {
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/settings.php", new File("."))
 }
-generateSettings.doLast{
+linkSettingsFile(dependsOn: generateSettings) << {
     runCmd("/bin/ln -s ${buildApplicationRoot}/sites/${ant.properties.site}/settings.php ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/", new File("."))
 }
 
@@ -89,7 +89,7 @@ generateVhost.doFirst {
 }
 
 
-task createFilesSymlinks(dependsOn: "generateSettings") << {
+task createFilesSymlinks(dependsOn: "linkSettingsFile") << {
     runCmd("/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(buildApplicationRoot))
 }
 
@@ -97,7 +97,7 @@ ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }
 
-task buildSite(dependsOn: ["copySrc", "generateSettings", "generateVhost", "createFilesSymlinks"]) {
+task buildSite(dependsOn: ["copySrc", "linkSettingsFile", "generateVhost", "createFilesSymlinks"]) {
 
 }
 

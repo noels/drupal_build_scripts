@@ -70,7 +70,7 @@ generateSettings.doFirst {
 }
 task linkSettingsFile(dependsOn: generateSettings) << {
     runCmd("/bin/mkdir -p ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/", new File("."))
-    runCmd("/bin/ln -s ${buildApplicationRoot}/sites/${ant.properties.site}/settings.php ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/", new File("."))
+    runCmd("/bin/ln -s sites/${ant.properties.site}/settings.php sites/${ant.properties.baseUrl}/", new File(buildApplicationRoot))
 }
 
 task generateVhost(type: Copy) {

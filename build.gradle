@@ -61,15 +61,34 @@ task generateSettings(type: Copy)  {
         include "${ant.properties.settingsTemplate}.skel"
     }
     into "${buildApplicationRoot}/sites/${ant.properties.site}"
-    rename {name->"settings.php"}
+    rename {name->"temp.settings.php"}
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
-generateSettings.doFirst {
-    runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.baseUrl}/settings.php", new File("."))
+task generateSiteSettings(type: Copy)  {
+    inputs.files propertyFiles
+    fileMode 0444
+    dirMode 0555
+    from("templates/") {
+        include "${ant.properties.site}.skel"
+    }
+    into "${buildApplicationRoot}/sites/${ant.properties.site}/"
+    rename {name->"${ant.properties.site}.settings.php"}
+    filter(ReplaceTokens, tokens: ant.properties)
 }
-task linkSiteFolder(dependsOn: generateSettings) << {
-    runCmd("/bin/ln -s ${ant.properties.site} ${ant.properties.baseUrl}", new File("${buildApplicationRoot}/sites"))
+
+task concatenateSettingsFiles(dependsOn: ["generateSettings", "generateSiteSettings"]) << {
+    ant.concat(destfile:"${buildApplicationRoot}/sites/${ant.properties.site}/settings.php") {
+        fileset(file: "${buildApplicationRoot}/sites/${ant.properties.site}/temp.settings.php")
+        fileset(file: "${buildApplicationRoot}/sites/${ant.properties.site}/${ant.properties.site}.settings.php")
+    }
+}
+
+generateSettings.doFirst {
+    runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/settings.php", new File("."))
+}
+task linkSiteFolder(dependsOn: "concatenateSettingsFiles") << {
+    runCmd("/bin/ln -sfn ${ant.properties.site} ${ant.properties.fullUrl}", new File("${buildApplicationRoot}/sites"))
 }
 
 task generateVhost(type: Copy) {

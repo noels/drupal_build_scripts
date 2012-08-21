@@ -82,6 +82,8 @@ task concatenateSettingsFiles(dependsOn: ["generateSettings", "generateSiteSetti
         fileset(file: "${buildApplicationRoot}/sites/${ant.properties.site}/temp.settings.php")
         fileset(file: "${buildApplicationRoot}/sites/${ant.properties.site}/${ant.properties.site}.settings.php")
     }
+    runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/temp.settings.php", new File("."))
+    runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/${ant.properties.site}.settings.php", new File("."))
 }
 
 generateSettings.doFirst {

@@ -26,7 +26,6 @@ ext.drush = { Map args ->
     String extraDrushParams = args.extraDrushParams?:""
 	def cmd = "${ant.properties["drush.executable"]} ${extraDrushParams} --uri=${siteUrl} --root=${root} --yes --verbose ${drushCmd}"
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
-    println cmd
 	ant.sshexec(
     	username: buildUser,
     	host:host,

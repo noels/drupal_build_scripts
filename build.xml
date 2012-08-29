@@ -3,6 +3,7 @@
     <property file="${site}.${env}.secure.properties" />
     <property file="${env}.secure.properties" />
     <property file="secure.properties" />
+    <property file="${site}.${env}.properties" />
     <loadproperties srcFile="${site}.properties" />
 	<loadproperties srcFile="${env}.properties" />
 	<loadproperties srcFile="build.properties" />

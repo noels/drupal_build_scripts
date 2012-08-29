@@ -85,6 +85,17 @@ task concatenateSettingsFiles(dependsOn: ["generateSettings", "generateSiteSetti
         fileset(file: "${buildApplicationRoot}/sites/${ant.properties.site}/temp.settings.php")
         fileset(file: "${buildApplicationRoot}/sites/${ant.properties.site}/${ant.properties.site}.settings.php")
     }
+    def settings = new File("${buildApplicationRoot}/sites/${ant.properties.site}/settings.php")
+
+    // Find all properties of the form extra.* and puts them into the settings file
+    def extraProperties = ant.properties.findAll{ entry ->entry.key =~ /^extra\./}
+    if (extraProperties){
+        settings.append( "\n### Custom properties of the form extra.<property> are added here #### \n\n")
+    }
+    extraProperties.each {
+        settings.append "\$conf[\"${it.key[6..-1]}\"] = ${it.value};\n"
+    }
+
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/temp.settings.php", new File("."))
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/${ant.properties.site}.settings.php", new File("."))
 }

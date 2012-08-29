@@ -23,7 +23,6 @@ ext.sql = { Map args ->
     Boolean failOnError = args.failOnError?: true
     def cmd = "${ant.properties["mysql.executable"]} -u${ant.properties."db.adminuser"} ${getPass()} -h${ant.properties."db.host"} -e\"${sqlQuery}\""
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${sqlQuery}\nOn host ${host} As ${buildUser}\nOutput:\n")
-    println cmd
     ant.sshexec(
             username: buildUser,
             host:host,
@@ -49,7 +48,6 @@ ext.restoreDatabaseFromGzip = {Map args ->
     Boolean failOnError = args?.failOnError?: true
     def cmd = "gunzip < ${file} | ${ant.properties["mysql.executable"]} -u${ant.properties."db.adminuser"} ${getPass()} -h${ant.properties."db.host"} ${ant.properties."db.name"}"
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
-    println cmd
     ant.sshexec(
             username: buildUser,
             host:host,
@@ -74,7 +72,6 @@ ext.backupDatabaseToGzip = { Map args ->
     Boolean failOnError = args?.failOnError?: true
     def cmd = "${ant.properties["mysqldump.executable"]} -u${ant.properties."db.adminuser"} ${getPass()} -h${ant.properties."db.host"} ${ant.properties."db.name"} | gzip > ${file}"
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
-    println cmd
     ant.sshexec(
             username: buildUser,
             host:host,

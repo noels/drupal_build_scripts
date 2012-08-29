@@ -13,7 +13,8 @@ ext.propertyFiles = [
         "secure.properties",
         "${ant.properties.site}.properties",
         "${ant.properties.env}.properties",
-        "build.properties"
+        "build.properties",
+        "${ant.properties.site}.${ant.properties.env}.properties"
 ]
 ant.importBuild "build.xml"
 apply from: "runCmd.gradle"

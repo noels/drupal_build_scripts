@@ -16,10 +16,10 @@ ext.propertyFiles = [
         "build.properties",
         "${ant.properties.site}.${ant.properties.env}.properties"
 ]
-ant.importBuild "build.xml"
 def env = System.getenv()
 ant.properties.BUILD_NUMBER = env['BUILD_NUMBER']?:new Date().getTime()
 ant.properties.workspace = env['WORKSPACE']?:'.'
+ant.importBuild "build.xml"
 apply from: "runCmd.gradle"
 apply from: "drush.gradle"
 apply from: "database.gradle"

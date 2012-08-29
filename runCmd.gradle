@@ -49,7 +49,6 @@ ext.runSshCmd = {cmd, host, args = [] ->
             append: true,
             trust:true,
             outputproperty: "outputBuffer",
-            output:ant.properties.remoteOutputFile,
             verbose: 'true'
     )
     if (ant.properties.outputBuffer){

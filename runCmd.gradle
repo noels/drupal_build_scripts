@@ -1,7 +1,6 @@
 ext.runCmd = {String cmd, File baseDir ->
     def sout = new StringBuffer()
     def serr = new StringBuffer()
-    println cmd
     def outProc = Runtime.runtime.exec(cmd, [] as String[], baseDir)
     def running = true
     def bufferPrinter = {buffer ->
@@ -39,7 +38,6 @@ ext.runSshCmd = {cmd, host, args = [] ->
     String passphrase = args.passphrase?:ant.properties."build.userPassphrase"
     Boolean failOnError = args.failOnError?: true
     new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
-    println cmd
     ant.sshexec(
             username: buildUser,
             host:host,

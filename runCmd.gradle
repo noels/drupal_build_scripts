@@ -37,7 +37,8 @@ ext.runSshCmd = {cmd, host, args = [] ->
     String buildUser = args.buildUser?:ant.properties."build.user"
     String passphrase = args.passphrase?:ant.properties."build.userPassphrase"
     Boolean failOnError = args.failOnError?: true
-    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\nOutput:\n")
+    def log = new File(ant.properties.remoteOutputFile)
+    log.append("\nRunning:: ${cmd}\nOn host ${host} As ${buildUser}\n")
     ant.sshexec(
             username: buildUser,
             host:host,
@@ -47,9 +48,14 @@ ext.runSshCmd = {cmd, host, args = [] ->
             passphrase:passphrase,
             append: true,
             trust:true,
-            outputproperty: "drushOutputBuffer",
+            outputproperty: "outputBuffer",
             output:ant.properties.remoteOutputFile,
             verbose: 'true'
     )
+    if (ant.properties.outputBuffer){
+        log.append("Output:\n${ant.properties.outputBuffer}")
+    }
+    log.append("Done\n")
+
 }
 

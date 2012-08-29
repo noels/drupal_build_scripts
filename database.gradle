@@ -40,7 +40,7 @@ ext.sql = { Map args ->
 
 
 ext.restoreDatabaseFromGzip = {Map args ->
-    String file = args?.file?:"${ant.properties.site}_${ant.properties.env}.sql.gz"
+    String file = args?.file?:"${ant.properties.site}_${ant.properties.env}_${ant.properties.BUILD_NUMBER}.sql.gz"
     String host = args?.host?:ant.properties."db.host"
     String keyFile = args?.keyFile?:ant.properties."build.userkey"
     String buildUser = args?.buildUser?:ant.properties."build.user"
@@ -64,7 +64,7 @@ ext.restoreDatabaseFromGzip = {Map args ->
 }
 
 ext.backupDatabaseToGzip = { Map args ->
-    String file = args?.file?:"${ant.properties.site}_${ant.properties.env}.sql.gz"
+    String file = args?.file?:"${ant.properties.site}_${ant.properties.env}_${ant.properties.BUILD_NUMBER}.sql.gz"
     String host = args?.host?:ant.properties."db.host"
     String keyFile = args?.keyFile?:ant.properties."build.userkey"
     String buildUser = args?.buildUser?:ant.properties."build.user"

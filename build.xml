@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="drupal_build_script">
-    <property file="${site}.${env}.secure.properties" />
-    <property file="${env}.secure.properties" />
-    <property file="secure.properties" />
-    <property file="${site}.${env}.properties" />
-    <loadproperties srcFile="${site}.properties" />
-	<loadproperties srcFile="${env}.properties" />
-	<loadproperties srcFile="build.properties" />
+    <property file="properties/secure/${site}.${env}.secure.properties" />
+    <property file="properties/secure/${env}.secure.properties" />
+    <property file="properties/secure/secure.properties" />
+    <property file="properties/${site}.${env}.properties" />
+    <loadproperties srcFile="properties/${site}.properties" />
+    <loadproperties srcFile="properties/${env}.properties" />
+    <loadproperties srcFile="properties/build.properties" />
     <property name="build" location="${workspace}/build" />
     <property name="target" location="${workspace}/target" />
 </project>

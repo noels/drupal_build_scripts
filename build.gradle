@@ -116,6 +116,21 @@ include_once('./sites/all/modules/contrib/memcache/memcache.inc');
 \$conf['memcache_servers'] = array(${ant.properties."memcache.servers".split(',').collect{ "${it}"}.join(", ")});
 """)
     }
+
+    if (ant.properties."db.slave"){
+        settings.append("""
+\$databases['default']['slave'][] = array(
+    'database' => '${ant.properties."db.name"}',
+    'host' => '${ant.properties."db.slave"}',
+    'username' => '${ ant.properties."db.slave.user" ?: ant.properties."db.user"}',
+    'password' => '${ ant.properties."db.slave.pass" ?: ant.properties."db.pass"}',
+    'port' => '',
+    'driver' => 'mysql',
+    'prefix' => '',
+);
+""")
+
+    }
     // Find all properties of the form extra.* and puts them into the settings file
     def extraProperties = ant.properties.findAll{ entry ->entry.key =~ /^extra\./}
     if (extraProperties){

@@ -87,31 +87,33 @@ task concatenateSettingsFiles(dependsOn: ["generateSettings", "generateSiteSetti
     }
     def settings = new File("${buildApplicationRoot}/sites/${ant.properties.site}/settings.php")
 
-/*
-    <% if config.varnish.any?  %> # Test if varnish array is empty
-    # Varnish configuration.
-    $conf['cache'] = TRUE;
-    $conf['cache_backends'] = array('sites/all/modules/contrib/varnish/varnish.cache.inc');
-    $conf['cache_class_cache_page'] = 'VarnishCache';
-    $conf['page_cache_invoke_hooks'] = FALSE;
-    $conf['reverse_proxy'] = TRUE;
-    $conf['reverse_proxy_addresses'] = array('<%= config.varnish.join( "', '" ) %>');
-    $conf['varnish_control_terminal'] = '<%= config.varnish.collect! { |x| x + ":6082" }.join(" ")  %>';
-    <% end %>
-
-*/
-
     // append config for any varnish servers
     def varnishServers = ant.properties."varnish.servers"
     if (varnishServers){
         settings.append("""
+# Varnish configuration.
 \$conf['cache'] = TRUE;
 \$conf['cache_backends'] = array('sites/all/modules/contrib/varnish/varnish.cache.inc');
 \$conf['cache_class_cache_page'] = 'VarnishCache';
 \$conf['page_cache_invoke_hooks'] = FALSE;
 \$conf['reverse_proxy'] = TRUE;
-\$conf['reverse_proxy_addresses'] = array(${ant.properties."varnish.servers".split(',').collect{ "\"${it}\""}.join(", ")}');
-\$conf['varnish_control_terminal'] = '${varnishServers.split(',').collect{"\"${it}:6082\" "}}';
+\$conf['reverse_proxy_addresses'] = array(${ant.properties."varnish.servers".split(',').collect{ "\"${it}\""}.join(", ")});
+\$conf['varnish_control_terminal'] = "${varnishServers.split(',').collect{"${it}:6082"}.join(' ')}";
+""")
+    }
+
+    // append config for any memcache servers
+    def memcacheServers = ant.properties."memcache.servers"
+    if (memcacheServers){
+        settings.append("""
+# Memcache configuration.
+include_once('./includes/cache.inc');
+include_once('./sites/all/modules/contrib/memcache/memcache.inc');
+\$conf['cache_backends'][] = 'sites/all/modules/contrib/memcache/memcache.inc';
+\$conf['cache_default_class'] = 'MemCacheDrupal';
+\$conf['cache_class_form'] = 'DrupalDatabaseCache';
+\$conf['memcache_key_prefix'] = '${ant.properties.env}-${ant.properties.site}-{ant.properties}';
+\$conf['memcache_servers'] = array(${ant.properties."memcache.servers".split(',').collect{ "${it}"}.join(", ")});
 """)
     }
     // Find all properties of the form extra.* and puts them into the settings file

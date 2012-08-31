@@ -1,8 +1,6 @@
 $conf['ssl_url'] = '@sslUrl@'; // REQUIRES trailing slash
 $conf['https'] = TRUE; // Drupal settings to enable mixed mode sessions
 
-
-
 // Production CMSADMIN server has different baseurl.
 // We have to identify the CMSADMIN server by its IP because the SERVER_NAME is rewritten by nginx.
 if ($_SERVER['SERVER_ADDR'] == '10.210.124.28') {

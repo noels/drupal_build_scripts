@@ -44,12 +44,18 @@ ext.drush = { Map args ->
     }
 }
 
-ext.drushTasks = []
-drush(drushCmd: "help --pipe 2> /dev/null")
-ant.properties.drushOutputBuffer.split("\n").each{
-    it.split(/\s/).each{ cmd ->
-        drushTasks << cmd
+
+try {
+    ext.drushTasks = []
+    drush(drushCmd: "help --pipe 2> /dev/null")
+    ant.properties.drushOutputBuffer.split("\n").each{
+        it.split(/\s/).each{ cmd ->
+            drushTasks << cmd
+        }
     }
+} catch (Exception e){
+    println e
+    println "WARNING: Drush failed to initialise all drush commands. This is not a fatal error."
 }
 
 drushTasks.each{ command ->

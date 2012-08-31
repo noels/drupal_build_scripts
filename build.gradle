@@ -137,7 +137,9 @@ include_once('./sites/all/modules/contrib/memcache/memcache.inc');
         settings.append( "\n### Custom properties of the form extra.<property> are added here #### \n\n")
     }
     extraProperties.each {
-        settings.append "\$conf[\"${it.key[6..-1]}\"] = ${it.value};\n"
+        if (it.value) {
+           settings.append "\$conf[\"${it.key[6..-1]}\"] = ${it.value};\n"
+        }
     }
 
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/temp.settings.php", new File("."))

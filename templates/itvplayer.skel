@@ -1,0 +1,57 @@
+// Production CMSADMIN server has different baseurl.
+// We have to identify the CMSADMIN server by its IP because the SERVER_NAME is rewritten by nginx.
+if ($_SERVER['SERVER_ADDR'] == '10.210.124.28') {
+  $base_url = 'http://@cmsadminBaseUrl@'; // NO trailing slash!
+  // HTTPS and HTTP are served from same settings.php
+  // If this is an HTTPS request then switch base_url to a SSL version
+  if (array_key_exists('HTTP_X_SECURE', $_SERVER) && strtolower($_SERVER['HTTP_X_SECURE']) == 'true') {
+    $base_url = trim($conf['ssl_url'], '/'); // ssl_url uses trailing slash. Base url doesn not so trim the slash.
+    $_SERVER['HTTPS'] = TRUE; // Tell php this is SSL traffic
+  }
+}
+else {
+  // On normal server.
+  $base_url = 'http://@baseUrl@';  // NO trailing slash!
+  // HTTPS only
+  $base_url = trim($conf['ssl_url'], '/'); // ssl_url uses trailing slash. Base url doesn not so trim the slash.
+  $_SERVER['HTTPS'] = TRUE; // Tell php this is SSL traffic
+}
+
+
+# Disable redis if we fallback from.
+if ((empty($_SERVER['HTTP_USER_AGENT']) || $_SERVER['HTTP_USER_AGENT'] != 'redis-ssi') && $_SERVER['REQUEST_METHOD'] != 'POST' && !drupal_is_cli()) {
+  $conf['redis_ssi_disable'] = TRUE;
+}
+$conf['session_inc'] = 'sites/all/modules/changed/redis_ssi/redis_ssi.session.inc';
+
+$conf['paywizard_soap_client_options'] = array(
+  'allow_self_signed' => TRUE,
+  'connection_timeout' => 5,
+  'login' => '@paywizardSoapClientLogin@',
+  'password' => '@paywizardSoapClientPassword@',
+);
+
+
+$conf['redis_ssi_nginx_path'] = '/@site@/redis';
+
+// Set ITV Facebook.
+$conf['player_fb_admins'] = '222303292';
+
+
+// Set comScore variables.
+$conf['comscore_suffix'] = 'page';
+$conf['comscore_prefix'] = 'itvplayer';
+$conf['comscore_frontpage_countername'] = 'home';
+$conf['comscore_base_url'] = '//ned.itv.com';
+$conf['comscore_client_name'] = 'itv';
+$conf['comscore_site_name'] = '@comscoreSiteName@';
+
+
+$conf['swfobject_uri'] = 'https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js';
+$conf['itvplayer_base_path'] = '@itvplayerBasePath@';
+$conf['itvplayer_uri'] = 'itvplayerUri@';
+$conf['itvplayer_css'] = '@itvplayerCss@';
+$conf['itvplayer_swf_base_path'] = '@itvplayerSwfBasePath@';
+$conf['itvplayer_cache'] = 'http://itvplayer-cache-ws';
+
+

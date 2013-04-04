@@ -1,12 +1,13 @@
 <?php
 
 $databases['default']['default'] = array(
-	'driver' => 'mysql',
+    'driver' => 'mysql',
     'database' => '@db.name@',
     'username' => '@db.user@',
     'password' => '@db.pass@',
     'host' => 'localhost',
     'prefix' => '',
+    'port' => '',
 );
 
 $update_free_access = FALSE;

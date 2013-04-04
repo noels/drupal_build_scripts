@@ -12,7 +12,7 @@ scripts at it.
 
 ## Templates and Properties
 
-The templates folder contains two templates, one for a generalted Drupal settings file and another for an Apache
+The templates folder contains two templates, one for a generated Drupal settings file and another for an Apache
 vhost file. You can add new properties by surrounding them with @: `@property@`. The values of these properties
 are automatically pulled from `*.properties` files.
 

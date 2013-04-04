@@ -1,5 +1,0 @@
-# Enable the SignedStories rest caching in this environment.
-$conf['ss_rest_cache_enable'] = TRUE;
-
-# Apple receipt validation server
-$conf['apple_tools_receipt_validation_server'] = '@appleToolsReceiptValidationServer@';

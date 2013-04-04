@@ -11,7 +11,7 @@ $databases['default']['default'] = array(
 );
 
 $update_free_access = FALSE;
-$drupal_hash_salt = '';
+$drupal_hash_salt = '@drupalHashSalt@';
 $base_url = 'http://@baseUrl@';
 
 ini_set('session.gc_probability', 1);

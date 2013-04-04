@@ -9,3 +9,7 @@ gradle deployDrupal -Denv=dev -Dsite=site -Dsrc=$WORKSPACE/src -Dworkspace=$WORK
 
 The above line is suitable for pasting into a jenkins job's "switches" input box.
 
+You may also be interested in the installDrupal task, which er.. installs drupal.
+
+
+

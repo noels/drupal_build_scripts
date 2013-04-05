@@ -4,6 +4,7 @@
 
 * Java
 * Gradle
+* The user running the script must have permission to write to `.gradle/`
 
 ## Source Control
 

@@ -212,8 +212,6 @@ task deployDrupal(dependsOn: packageSite) << {
         createReleaseSymlinks(server)
         restartApache(server)
     }
-
-
 }
 
 task installDrupal(dependsOn: deployDrupal) << {

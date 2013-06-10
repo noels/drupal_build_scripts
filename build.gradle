@@ -19,10 +19,10 @@ ext.propertyFiles = [
 def env = System.getenv()
 ant.properties.BUILD_NUMBER = env['BUILD_NUMBER']?:new Date().getTime()
 ant.properties.workspace = env['WORKSPACE']?:'.'
-apply from: "runCmd.gradle"
-apply from: "drush.gradle"
-apply from: "database.gradle"
-apply from: "deploy.gradle"
+apply from: "https://raw.github.com/noels/drupal_build_scripts/master/runCmd.gradle"
+apply from: "https://raw.github.com/noels/drupal_build_scripts/master/drush.gradle"
+apply from: "https://raw.github.com/noels/drupal_build_scripts/master/database.gradle"
+apply from: "https://raw.github.com/noels/drupal_build_scripts/master/deploy.gradle"
 
 ext.buildApplicationRoot = "${ant.properties.build}/${ant.properties."application.name"}/build_${ant.properties.BUILD_NUMBER}"
 

@@ -9,17 +9,16 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 import org.apache.tools.ant.filters.ReplaceTokens
 
 ext.propertyFiles = [
-        "${ant.properties.env}.secure.properties",
-        "secure.properties",
-        "${ant.properties.site}.properties",
-        "${ant.properties.env}.properties",
-        "build.properties",
-        "${ant.properties.site}.${ant.properties.env}.properties"
+        "properties/secure/${ant.properties.env}.secure.properties",
+        "properties/secure/secure.properties",
+        "properties/${ant.properties.site}.properties",
+        "properties/${ant.properties.env}.properties",
+        "properties/build.properties",
+        "properties/${ant.properties.site}.${ant.properties.env}.properties"
 ]
 def env = System.getenv()
 ant.properties.BUILD_NUMBER = env['BUILD_NUMBER']?:new Date().getTime()
 ant.properties.workspace = env['WORKSPACE']?:'.'
-ant.importBuild "build.xml"
 apply from: "runCmd.gradle"
 apply from: "drush.gradle"
 apply from: "database.gradle"

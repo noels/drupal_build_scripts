@@ -197,7 +197,7 @@ task correctOwnership() << {
     servers << ant.properties."drush.host"
     ant.properties.webservers.split(",").each { servers << it   }
     servers.each{server ->
-        runSshCmd("/usr/bin/sudo /bin/chown -R ${ant.properties."build.user"} ${ant.properties.deployFolder}", server)
+        runSshCmd("/usr/bin/sudo /bin/chown -R ${ant.properties."apacheUser"} ${ant.properties.deployFolder}", server)
     }
 }
 

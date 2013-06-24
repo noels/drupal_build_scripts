@@ -1,6 +1,7 @@
 ext.runCmd = {String cmd, File baseDir ->
     def sout = new StringBuffer()
     def serr = new StringBuffer()
+    println "\nRunning:: ${cmd}\nOn localhost\n"
     def outProc = Runtime.runtime.exec(cmd, [] as String[], baseDir)
     def running = true
     def bufferPrinter = {buffer ->

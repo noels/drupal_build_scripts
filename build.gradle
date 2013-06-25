@@ -191,7 +191,7 @@ task generateHtaccess(dependsOn: copySrc)m << {
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
-task buildSite(dependsOn: ["copySrc", "linkSiteFolder", "generateVhost", "createFilesSymlinks"]) {
+task buildSite(dependsOn: ["copySrc", "linkSiteFolder", "generateVhost", "createFilesSymlinks", "generateHtaccess"]) {
 
 }
 

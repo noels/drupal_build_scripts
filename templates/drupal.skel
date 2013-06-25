@@ -26,6 +26,7 @@ $conf['anonymous'] = 'Visitor';
 $conf['maintenance_theme'] = 'bartik';
 $conf['reverse_proxy'] = FALSE;
 $conf['reverse_proxy_addresses'] = array('127.0.0.1');
+$conf['file_public_path'] = '@drupal.filesDir@';
 @errorReportingComment@error_reporting(0);
 
 

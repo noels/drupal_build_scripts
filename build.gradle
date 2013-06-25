@@ -179,7 +179,7 @@ ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }
 
-task generateHtaccess(dependsOn: copySrc) {
+task generateHtaccess(type: Copy, dependsOn: copySrc) {
     inputs.files propertyFiles
     fileMode 0444
     dirMode 0555

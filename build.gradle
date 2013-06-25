@@ -150,6 +150,7 @@ generateSettings.doFirst {
     runCmd("/bin/rm -f ${buildApplicationRoot}/sites/${ant.properties.site}/settings.php", new File("."))
 }
 task linkSiteFolder(dependsOn: "concatenateSettingsFiles") << {
+
     runCmd("/bin/ln -sfn ${ant.properties.site} ${ant.properties.fullUrl}", new File("${buildApplicationRoot}/sites"))
 }
 
@@ -176,6 +177,18 @@ task createFilesSymlinks(dependsOn: "linkSiteFolder") << {
 
 ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
+}
+
+task generateHtaccess(dependsOn: copySrc)m << {
+    inputs.files propertyFiles
+    fileMode 0444
+    dirMode 0555
+    from("templates/"){
+        include "htaccess.skel"
+    }
+    into "${buildApplicationRoot}"
+    rename {name->".htaccess"}
+    filter(ReplaceTokens, tokens: ant.properties)
 }
 
 task buildSite(dependsOn: ["copySrc", "linkSiteFolder", "generateVhost", "createFilesSymlinks"]) {

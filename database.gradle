@@ -90,7 +90,7 @@ ext.backupDatabaseToGzip = { Map args ->
 
 task dropDatabase() << {
     def host = ant.properties."db.host"
-    runCmd
+    sql( sqlQuery: dropDatabaseSql)
 }
 
 task backupDatabase() << {

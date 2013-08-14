@@ -22,6 +22,7 @@ ant.properties.BUILD_NUMBER = env['BUILD_NUMBER']?:new Date().getTime()
 ant.properties.workspace = env['WORKSPACE']?:'.'
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/runCmd.gradle"
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/drush.gradle"
+
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/database.gradle"
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/deploy.gradle"
 
@@ -247,4 +248,12 @@ task installDrupal(dependsOn: deployDrupal) << {
                 drushCmd: "pm-enable ${ant.properties."drupal.modules".split(',').join(' ')}"
         )
     }
+}
+
+task makeDrupal() << {
+    drushMake(
+        extraArgs: "--working-copy --no-gitinfofile",
+        makeFile: "./distro.make",
+        target: "${ant.properties.src}"
+    )
 }

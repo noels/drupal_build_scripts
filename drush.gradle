@@ -43,6 +43,17 @@ ext.drush = { Map args ->
         throw new Exception("Drush command returned an error:\n${ant.properties.drushOutputBuffer}")
     }
 }
+ext.drushMake = { Map args ->
+    String makeFile = args.makeFile
+    String target = args.target?:ant.properties.build
+    Boolean failOnError = args.failOnError?: true
+	def cmd = "${ant.properties["drush.executable"]} --debug make ${args.extraArgs} ${makeFile} ${target}"
+    new File(ant.properties.remoteOutputFile).append("\nRunning:: ${cmd}\nOn localhost in ${ant.properties.workspace}")
+	runCmd(
+    	cmd,
+    	new File(ant.properties.workspace)
+  	)
+}
 
 
 try {

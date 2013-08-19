@@ -21,7 +21,8 @@ ant.importBuild "build.xml"
 ant.properties.BUILD_NUMBER = env['BUILD_NUMBER']?:new Date().getTime()
 ant.properties.workspace = env['WORKSPACE']?:'.'
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/runCmd.gradle"
-apply from: "https://raw.github.com/noels/drupal_build_scripts/master/drush.gradle"
+//apply from: "https://raw.github.com/noels/drupal_build_scripts/master/drush.gradle"
+apply from: "/Users/noels/Documents/workspace/silex/drupal_build_scripts/drush.gradle"
 
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/database.gradle"
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/deploy.gradle"
@@ -156,16 +157,16 @@ task linkSiteFolder(dependsOn: "concatenateSettingsFiles") << {
 }
 
 task generateVhost(type: Copy) {
-    inputs.files propertyFiles
-    fileMode 0444
-    dirMode 0555
-    from("templates/"){
-        include "vhost.skel"
-    }
-    into "${ant.properties.target}/etc/"
-    rename {name->"vhost-${ant.properties.site}.conf"}
-    filter(ReplaceTokens, tokens: ant.properties)
-}
+     inputs.files propertyFiles
+     fileMode 0644
+     dirMode 0755
+     from("templates/"){
+         include "vhost.skel"
+     }
+     into "${ant.properties.target}/etc/"
+     rename {name->"vhost-${ant.properties.site}.conf"}
+     filter(ReplaceTokens, tokens: ant.properties)
+ }
 
 generateVhost.doFirst {
     runCmd("/bin/rm -f target/etc/vhost-${ant.properties.site}.conf", new File("."))

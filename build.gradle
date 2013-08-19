@@ -30,10 +30,6 @@ ext.buildApplicationRoot = "${ant.properties.build}/${ant.properties."applicatio
 task init {
     inputs.files propertyFiles
     //outputs.file ant.properties."drupal.filesTarget"
-    doFirst{
-        //create the files directory target as gradle can't handle dangling symlinks
-        runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )
-    }
 }
 
 task clean << {
@@ -171,10 +167,6 @@ generateVhost.doFirst {
 }
 
 
-task createFilesSymlinks(dependsOn: "linkSiteFolder") << {
-    runCmd("/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}", new File(buildApplicationRoot))
-}
-
 ext.dbUrl = {
     "mysql://${ant.properties."db.adminuser"}:${ant.properties."db.adminpass"}@${ant.properties."db.host"}/${ant.properties."db.name"}"
 }
@@ -191,7 +183,7 @@ task generateHtaccess(type: Copy, dependsOn: copySrc) {
     filter(ReplaceTokens, tokens: ant.properties)
 }
 
-task buildSite(dependsOn: ["copySrc", "linkSiteFolder", "generateVhost", "createFilesSymlinks", "generateHtaccess"]) {
+task buildSite(dependsOn: ["copySrc", "linkSiteFolder", "generateVhost", "generateHtaccess"]) {
 
 }
 

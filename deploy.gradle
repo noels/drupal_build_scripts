@@ -6,6 +6,7 @@ ext.copyFilesToServer = {server, args = [] ->
     runCmd("scp ${ant.properties.sshOptions} -i ${keyFile} ${ant.properties."application.name"}.tar.gz ${buildUser}@${server}:${deployFolder}", new File(ant.properties.target))
     runCmd("scp ${ant.properties.sshOptions} -i ${keyFile} etc/vhost-${ant.properties.site}.conf ${buildUser}@${server}:${ant.properties."apacheVhostDir"}", new File(ant.properties.target))
     runSshCmd( "cd ${deployFolder}; tar xzf ${ant.properties."application.name"}.tar.gz", server)
+    runSshCmd( "/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}",server)
     runSshCmd("rm -f ${deployFolder}/${ant.properties."application.name"}.tar.gz", server)
 }
 

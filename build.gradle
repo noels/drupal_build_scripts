@@ -21,9 +21,7 @@ ant.importBuild "build.xml"
 ant.properties.BUILD_NUMBER = env['BUILD_NUMBER']?:new Date().getTime()
 ant.properties.workspace = env['WORKSPACE']?:'.'
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/runCmd.gradle"
-//apply from: "https://raw.github.com/noels/drupal_build_scripts/master/drush.gradle"
-apply from: "/Users/noels/Documents/workspace/silex/drupal_build_scripts/drush.gradle"
-
+apply from: "https://raw.github.com/noels/drupal_build_scripts/master/drush.gradle"
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/database.gradle"
 apply from: "https://raw.github.com/noels/drupal_build_scripts/master/deploy.gradle"
 

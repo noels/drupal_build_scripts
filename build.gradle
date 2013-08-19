@@ -31,7 +31,7 @@ ext.buildApplicationRoot = "${ant.properties.build}/${ant.properties."applicatio
 
 task init {
     inputs.files propertyFiles
-    outputs.file ant.properties."drupal.filesTarget"
+    //outputs.file ant.properties."drupal.filesTarget"
     doFirst{
         //create the files directory target as gradle can't handle dangling symlinks
         runCmd("mkdir -p ${ant.properties."drupal.filesTarget"}", new File(".") )

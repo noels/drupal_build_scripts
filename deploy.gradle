@@ -6,7 +6,6 @@ ext.copyFilesToServer = {server, args = [] ->
     runCmd("scp ${ant.properties.sshOptions} -i ${keyFile} ${ant.properties."application.name"}.tar.gz ${buildUser}@${server}:${deployFolder}", new File(ant.properties.target))
     runCmd("scp ${ant.properties.sshOptions} -i ${keyFile} etc/vhost-${ant.properties.site}.conf ${buildUser}@${server}:${ant.properties."apacheVhostDir"}", new File(ant.properties.target))
     runSshCmd( "cd ${deployFolder}; tar xzf ${ant.properties."application.name"}.tar.gz", server)
-    runSshCmd( "/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${ant.properties."drupal.filesDir"}",server)
     runSshCmd("rm -f ${deployFolder}/${ant.properties."application.name"}.tar.gz", server)
 }
 
@@ -15,6 +14,8 @@ ext.createReleaseSymlinks = {server, args = [] ->
     String buildUser = args.buildUser?:ant.properties."build.user"
     String deployFolder = "${ant.properties.deployFolder}/build_${ant.properties.BUILD_NUMBER}"
     String releaseFolder = "${ant.properties.deployFolder}/current"
+    runSshCmd( "/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${deployFolder}/${ant.properties."drupal
+    .filesDir"}",server)
     runSshCmd("ln -sfn ${deployFolder} ${releaseFolder}", server)
 }
 

@@ -148,6 +148,9 @@ generateSettings.doFirst {
 task linkSiteFolder(dependsOn: "concatenateSettingsFiles") << {
 
     runCmd("/bin/ln -sfn ${ant.properties.site} ${ant.properties.fullUrl}", new File("${buildApplicationRoot}/sites"))
+    if (ant.properties.is_default){
+        runCmd("/bin/ln -sfn ${ant.properties.site}/settings.php default/", new File("${buildApplicationRoot}/sites"))
+    }
 }
 
 task generateVhost(type: Copy) {

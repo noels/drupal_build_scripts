@@ -39,7 +39,7 @@ ext.drush = { Map args ->
         output:ant.properties.remoteOutputFile,
         verbose: 'true'
   	)
-    if (args.?failOnError && ant.properties.drushOutputBuffer.contains("[error]")){
+    if (args.failOnError && ant.properties.drushOutputBuffer.contains("[error]")){
         throw new Exception("Drush command returned an error:\n${ant.properties.drushOutputBuffer}")
     }
 }

@@ -30,7 +30,7 @@ ext.drush = { Map args ->
     	username: buildUser,
     	host:host,
     	command: cmd,
-    	failonerror:failOnError,
+    	failonerror:false,
     	keyfile:keyFile,
         passphrase:passphrase,
         append: true,

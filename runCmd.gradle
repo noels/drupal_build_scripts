@@ -58,4 +58,3 @@ ext.runSshCmd = {cmd, host, args = [] ->
     log.append("Done\n")
 
 }
-

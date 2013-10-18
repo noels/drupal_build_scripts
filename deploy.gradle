@@ -15,6 +15,7 @@ ext.createReleaseSymlinks = {server, args = [] ->
     String deployFolder = "${ant.properties.deployFolder}/build_${ant.properties.BUILD_NUMBER}"
     String releaseFolder = "${ant.properties.deployFolder}/current"
     runSshCmd( "/bin/ln -sfn ${ant.properties."drupal.filesTarget"} ${deployFolder}/${ant.properties."drupal.filesDir"}",server)
+    runSshCmd( "/bin/chmod 777 ${deployFolder}/${ant.properties."drupal.filesDir"}",server)
     runSshCmd("ln -sfn ${deployFolder} ${releaseFolder}", server)
 }
 
